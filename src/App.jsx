@@ -16,6 +16,7 @@ import { useDispatch } from "react-redux";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./utils/firebase";
 import { addUser, removeUser } from "./utils/userSlice";
+import ProtectedRoute from "./utils/ProtectedRoute";
 
 function App() {
   const dispatch = useDispatch();
@@ -23,7 +24,18 @@ function App() {
   const [cartItem, setCartItem] = useState([]);
 
   const addToCart = (item) => {
-    setCartItem([...cartItem, item]);
+    const existingItem = cartItem.find((cartItem) => cartItem.id === item.id);
+    if (existingItem) {
+      setCartItem(
+        cartItem.map((cartItem) =>
+          cartItem.id === item.id
+            ? { ...cartItem, quantity: cartItem.quantity + item.quantity }
+            : cartItem
+        )
+      );
+    } else {
+      setCartItem([...cartItem, item]);
+    }
   };
 
   // local storage
@@ -56,16 +68,24 @@ function App() {
       <Navbar />
       <Routes>
         <Route index path="/" element={<Home />} />
-        <Route path="categories" element={<Categories />}>
+        <Route path="categories" element={
+          <ProtectedRoute>
+            <Categories />
+          </ProtectedRoute>
+        }>
           <Route path="all" element={<All />} />
-          <Route path="shoes" element={<Shoes />} />
-          <Route path="backpacks" element={<Backpacks />} />
-          <Route path="shirt" element={<Shirt />} />
-          <Route path="accessories" element={<Accessories />} />
-          <Route path="tshirt" element={<Tshirt />} />
-          <Route path="jeans" element={<Jeans />} />
-        </Route>
-        <Route path="categories/product/:id" element={<ProductPage />} />
+
+
+
+
+
+
+
+
+
+
+
+          </ProtectedRoute>            <ProductPage />          <ProtectedRoute>        <Route path="categories/product/:id" element={        </Route>          <Route path="jeans" element={<Jeans />} />          <Route path="tshirt" element={<Tshirt />} />          <Route path="accessories" element={<Accessories />} />          <Route path="shirt" element={<Shirt />} />          <Route path="backpacks" element={<Backpacks />} />          <Route path="shoes" element={<Shoes />} />        } />
         <Route path="/user" element={<User />} />
       </Routes>
     </CartContext.Provider>
