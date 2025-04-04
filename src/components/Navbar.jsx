@@ -2,7 +2,7 @@ import "./Navbar.css";
 
 import LogoImg2 from "../img/new-logo-nav.png";
 import { Link, useNavigate } from "react-router-dom";
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState } from "react";
 import CartWithItems from "./CartWithItems";
 import EmptyCart from "./EmptyCart";
 import { CartContext } from "../pages/ProductPage";
@@ -20,6 +20,14 @@ function Navbar() {
   const { cartItem } = useContext(CartContext);
   const user = useSelector(store => store.user);
 
+  const handleScroll = () => {
+    if (window.scrollY > 10) {
+      setSticky(true);
+    } else {
+      setSticky(false);
+    }
+  };
+
   const openCart = () => {
     setCart(!cart);
   };
@@ -34,18 +42,7 @@ function Navbar() {
       });
   };
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setSticky(true);
-      } else {
-        setSticky(false);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  window.addEventListener("scroll", handleScroll);
 
   const scrollToTop = () => {
     window.scrollTo({

@@ -29,28 +29,21 @@ const LoginSignup = () => {
 
     setIsLoading(true);
     try {
-      if (!isSignInForm) {
-        await createUserWithEmailAndPassword(
           auth,
           email.current.value,
           password.current.value
         );
+        navigate("/");
       } else {
-        await signInWithEmailAndPassword(
+        const userCredential = await signInWithEmailAndPassword(
           auth,
           email.current.value,
           password.current.value
         );
+        navigate("/");
       }
-      navigate("/");
     } catch (error) {
-      setErrorMessage(
-        error.code === "auth/email-already-in-use"
-          ? "Email already exists"
-          : "Invalid email or password"
-      );
-    } finally {
-      setIsLoading(false);
+      setErrorMessage(error.message);
     }
   };
 
@@ -88,7 +81,6 @@ const LoginSignup = () => {
         <div className="submit" onClick={handlButtonClick}>
           {isSignInForm ? "Login" : "Sign Up"}
         </div>
-        {isLoading && <p>Loading...</p>}
       </div>
     </div>
   );
