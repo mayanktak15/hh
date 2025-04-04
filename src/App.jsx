@@ -24,7 +24,18 @@ function App() {
   const [cartItem, setCartItem] = useState([]);
 
   const addToCart = (item) => {
-    setCartItem([...cartItem, item]);
+    const existingItem = cartItem.find((cartItem) => cartItem.id === item.id);
+    if (existingItem) {
+      setCartItem(
+        cartItem.map((cartItem) =>
+          cartItem.id === item.id
+            ? { ...cartItem, quantity: cartItem.quantity + item.quantity }
+            : cartItem
+        )
+      );
+    } else {
+      setCartItem([...cartItem, item]);
+    }
   };
 
   // local storage

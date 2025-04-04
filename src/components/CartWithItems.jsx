@@ -21,12 +21,12 @@ function CartWithItems() {
     <>
       <div className="full-cart-div">
         <div className="full-cart">
-          {cartItem.map((item, id) =>
-            cartItem.length !== 0 ? (
-              <CartItem key={id} item={item} setCartItem={setCartItem} />
-            ) : (
-              <EmptyCart key={id} />
-            )
+          {cartItem.length === 0 ? (
+            <EmptyCart />
+          ) : (
+            cartItem.map((item, id) => (
+              <CartItem key={item.id} item={item} setCartItem={setCartItem} />
+            ))
           )}
         </div>
       </div>
