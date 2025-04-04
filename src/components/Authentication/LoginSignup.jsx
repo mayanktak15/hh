@@ -29,6 +29,8 @@ const LoginSignup = () => {
 
     setIsLoading(true);
     try {
+      if (!isSignInForm) {
+        const userCredential = await createUserWithEmailAndPassword(
           auth,
           email.current.value,
           password.current.value
@@ -44,6 +46,8 @@ const LoginSignup = () => {
       }
     } catch (error) {
       setErrorMessage(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
