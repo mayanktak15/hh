@@ -43,6 +43,12 @@ function ProductPage() {
     setNotify(!notify);
   };
 
+  const handleAddToCart = () => {
+    const itemWithQuantity = { ...item[0], quantity: quantity };
+    addToCart(itemWithQuantity);
+    showNotify();
+  };
+
   return (
     <>
       <div
@@ -91,10 +97,7 @@ function ProductPage() {
               </div>
               <div className="atc-buy">
                 <button
-                  onClick={() => {
-                    addToCart(item[0]);
-                    showNotify();
-                  }}
+                  onClick={handleAddToCart}
                   className="atc-btn"
                 >
                   add to cart

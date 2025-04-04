@@ -1,62 +1,54 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { CartContext } from "../pages/ProductPage";
 import { IconX } from "@tabler/icons-react";
 
-function CartItem() {
-  const [quantity, setQuantity] = useState(1);
-  const { cartItem, setCartItem } = useContext(CartContext);
+function CartItem({ item, setCartItem }) {
+  const { cartItem } = useContext(CartContext);
 
   const increase = () => {
-    if (quantity >= 1) {
-      setQuantity(quantity + 1);
+    if (item.quantity >= 1) {
+      updateCartItemQuantity(item.id, item.quantity + 1);
     }
   };
 
   const decrease = () => {
-    if (quantity > 1) {
-      setQuantity(quantity - 1);
+    if (item.quantity > 1) {
+      updateCartItemQuantity(item.id, item.quantity - 1);
     }
   };
 
-  const calcPrice = (quantity, item) => {
-    return quantity * item;
+  const updateCartItemQuantity = (itemId, newQuantity) => {
+    const updatedCart = cartItem.map((cartItem) =>
+      cartItem.id === itemId
+        ? { ...cartItem, quantity: newQuantity }
+        : cartItem
+    );
+    setCartItem(updatedCart);
   };
-
-  const [deleteItem, setDeleteItem] = useState(cartItem);
 
   const removeFromCart = (id) => {
-    const updateCart = cartItem.filter((item) => item.id !== id);
-    setDeleteItem(updateCart);
-    const json = JSON.stringify(cartItem.id);
-    localStorage.removeItem("cartItem", json);
+    const updatedCart = cartItem.filter((cartItem) => cartItem.id !== id);
+    setCartItem(updatedCart);
   };
 
-  useEffect(() => {
-    setCartItem(deleteItem);
-  }, [deleteItem, setCartItem]);
-
   return (
-    <>
-      {cartItem.map((item, id) => (
-        <div key={id} className="cart-item">
-          <div className="cart-img">
-            <img src={item.img} alt="product" />
-          </div>
-          <div className="cart-middle">
-            <p className="cart-name">{item.description}</p>
-            <div className="cart-btns">
-              <button onClick={decrease}>-</button>
-              <p className="quantity">{quantity}</p>
-              <button onClick={increase}>+</button>
-            </div>
-          </div>
-          <div className="cart-right">
-            <p className="cart-price">₹{calcPrice(quantity, item.price)}</p>
-            <IconX className="cart-remove" onClick={() => removeFromCart(item.id)} />
-          </div>
+    <div className="cart-item">
+      <div className="cart-img">
+        <img src={item.img} alt="product" />
+      </div>
+      <div className="cart-middle">
+        <p className="cart-name">{item.description}</p>
+        <div className="cart-btns">
+          <button onClick={decrease}>-</button>
+          <p className="quantity">{item.quantity}</p>
+          <button onClick={increase}>+</button>
         </div>
-      ))}
-    </>
+      </div>
+      <div className="cart-right">
+        <p className="cart-price">₹{(item.price * item.quantity).toFixed(2)}</p>
+        <IconX className="cart-remove" onClick={() => removeFromCart(item.id)} />
+      </div>
+    </div>
   );
 }
 
