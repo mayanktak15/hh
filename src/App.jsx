@@ -55,11 +55,24 @@ function App() {
     sessionStorage.setItem("cartItem", json);
   }, [cartItem]);
 
+  // Modified useEffect to handle cart persistence
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         const { uid, email, displayName } = user;
         dispatch(addUser({ uid: uid, email: email, displayName: displayName }));
+
+        // Load cart data when user logs in
+        const db = getDatabase();
+        get(ref(db, `carts/${uid}`)).then((snapshot) => {
+          if (snapshot.exists()) {
+            const savedCart = snapshot.val().items;
+            setCartItem(savedCart);
+            dispatch(setCart(savedCart));
+          }
+        }).catch((error) => {
+          console.error("Error loading cart:", error);
+        });
       } else {
         dispatch(removeUser());
       }
