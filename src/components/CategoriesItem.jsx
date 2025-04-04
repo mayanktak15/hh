@@ -1,7 +1,21 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { items } from "./AllData";
+import { useSelector } from "react-redux";
 
 function CategoriesItem() {
+  const navigate = useNavigate();
+  const user = useSelector(store => store.user);
+
+  const handleProductClick = (e, productId) => {
+    e.preventDefault();
+    if (!user) {
+      sessionStorage.setItem('intendedUrl', `/categories/product/${productId}`);
+      navigate("/user");
+      return;
+    }
+    navigate(`/categories/product/${productId}`);
+  };
+
   return (
     <>
       <div className="proud-container">
@@ -10,7 +24,7 @@ function CategoriesItem() {
             {items.map((item) => (
               <div key={item.id} className="product normal">
                 <Link
-                  onClick={() => window.top(0, 0)}
+                  onClick={(e) => handleProductClick(e, item.id)}
                   to={`/categories/product/${item.id}`}
                 >
                   <div className="product-header">

@@ -7,8 +7,9 @@ const ProtectedRoute = ({ children }) => {
     
     if (!user) {
         // Save the attempted URL before redirect
-        sessionStorage.setItem('intendedUrl', location.pathname);
-        return <Navigate to="/user" state={{ from: location }} replace />;
+        const currentPath = location.pathname + location.search;
+        sessionStorage.setItem('intendedUrl', currentPath);
+        return <Navigate to="/user" replace />;
     }
 
     return children;
