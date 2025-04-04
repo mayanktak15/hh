@@ -7,7 +7,9 @@ import CartWithItems from "./CartWithItems";
 import EmptyCart from "./EmptyCart";
 import { CartContext } from "../pages/ProductPage";
 import { IconMenu2, IconShoppingCart, IconX, IconUser } from "@tabler/icons-react";
-
+import { useSelector } from "react-redux";
+import { signOut } from "firebase/auth";
+import { auth } from "../utils/firebase";
 
 function Navbar() {
   const [sticky, setSticky] = useState(false);
@@ -15,6 +17,7 @@ function Navbar() {
   const [cart, setCart] = useState(false);
 
   const { cartItem } = useContext(CartContext);
+  const user = useSelector(store => store.user);
 
   const handleScroll = () => {
     if (window.scrollY > 10) {
@@ -26,6 +29,16 @@ function Navbar() {
 
   const openCart = () => {
     setCart(!cart);
+  };
+
+  const handleSignOut = () => {
+    signOut(auth)
+      .then(() => {
+        navigate("/");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   window.addEventListener("scroll", handleScroll);
@@ -106,9 +119,16 @@ function Navbar() {
                 product page
               </Link>
               {/* User Authentication */}
-             <Link to="/user">
-             < IconUser/>
-             </Link>
+              {user ? (
+                <>
+                  <span>{user.email}</span>
+                  <button onClick={handleSignOut}>Sign Out</button>
+                </>
+              ) : (
+                <Link to="/user">
+                  <IconUser/>
+                </Link>
+              )}
               <i
                 data-array-length={cartItem.length}
                 onClick={openCart}
