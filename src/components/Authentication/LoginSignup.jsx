@@ -42,9 +42,9 @@ const LoginSignup = () => {
           email.current.value,
           password.current.value
         );
-        // Get the saved URL and navigate
-        const intendedUrl = localStorage.getItem('intendedUrl');
-        localStorage.removeItem('intendedUrl');
+        // Get the intended URL from sessionStorage
+        const intendedUrl = sessionStorage.getItem('intendedUrl');
+        sessionStorage.removeItem('intendedUrl');
         navigate(intendedUrl || '/');
       }
     } catch (error) {
