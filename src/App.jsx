@@ -68,11 +68,7 @@ function App() {
       <Navbar />
       <Routes>
         <Route index path="/" element={<Home />} />
-        <Route path="categories" element={
-          <ProtectedRoute>
-            <Categories />
-          </ProtectedRoute>
-        }>
+        <Route path="categories" element={<Categories />}>
           <Route path="all" element={<All />} />
           <Route path="shoes" element={<Shoes />} />
           <Route path="backpacks" element={<Backpacks />} />
@@ -81,11 +77,14 @@ function App() {
           <Route path="tshirt" element={<Tshirt />} />
           <Route path="jeans" element={<Jeans />} />
         </Route>
-        <Route path="categories/product/:id" element={
-          <ProtectedRoute>
-            <ProductPage />
-          </ProtectedRoute>
-        } />
+        <Route
+          path="categories/product/:id"
+          element={
+            <ProtectedRoute>
+              <ProductPage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/user" element={<User />} />
       </Routes>
     </CartContext.Provider>

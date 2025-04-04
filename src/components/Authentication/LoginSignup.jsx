@@ -30,19 +30,22 @@ const LoginSignup = () => {
     setIsLoading(true);
     try {
       if (!isSignInForm) {
-        const userCredential = await createUserWithEmailAndPassword(
+        await createUserWithEmailAndPassword(
           auth,
           email.current.value,
           password.current.value
         );
         navigate("/");
       } else {
-        const userCredential = await signInWithEmailAndPassword(
+        await signInWithEmailAndPassword(
           auth,
           email.current.value,
           password.current.value
         );
-        navigate("/");
+        // Get the saved URL and navigate
+        const intendedUrl = localStorage.getItem('intendedUrl');
+        localStorage.removeItem('intendedUrl');
+        navigate(intendedUrl || '/');
       }
     } catch (error) {
       setErrorMessage(error.message);
