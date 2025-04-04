@@ -24,18 +24,7 @@ function App() {
   const [cartItem, setCartItem] = useState([]);
 
   const addToCart = (item) => {
-    const existingItem = cartItem.find((cartItem) => cartItem.id === item.id);
-    if (existingItem) {
-      setCartItem(
-        cartItem.map((cartItem) =>
-          cartItem.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + item.quantity }
-            : cartItem
-        )
-      );
-    } else {
-      setCartItem([...cartItem, item]);
-    }
+    setCartItem([...cartItem, item]);
   };
 
   // local storage
@@ -74,18 +63,18 @@ function App() {
           </ProtectedRoute>
         }>
           <Route path="all" element={<All />} />
-
-
-
-
-
-
-
-
-
-
-
-          </ProtectedRoute>            <ProductPage />          <ProtectedRoute>        <Route path="categories/product/:id" element={        </Route>          <Route path="jeans" element={<Jeans />} />          <Route path="tshirt" element={<Tshirt />} />          <Route path="accessories" element={<Accessories />} />          <Route path="shirt" element={<Shirt />} />          <Route path="backpacks" element={<Backpacks />} />          <Route path="shoes" element={<Shoes />} />        } />
+          <Route path="shoes" element={<Shoes />} />
+          <Route path="backpacks" element={<Backpacks />} />
+          <Route path="shirt" element={<Shirt />} />
+          <Route path="accessories" element={<Accessories />} />
+          <Route path="tshirt" element={<Tshirt />} />
+          <Route path="jeans" element={<Jeans />} />
+        </Route>
+        <Route path="categories/product/:id" element={
+          <ProtectedRoute>
+            <ProductPage />
+          </ProtectedRoute>
+        } />
         <Route path="/user" element={<User />} />
       </Routes>
     </CartContext.Provider>
