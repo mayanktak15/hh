@@ -24,8 +24,8 @@ Follow these instructions to set up and run the project locally on your machine.
 
 ### Installation
 
-1. Clone the repository: `git clone https://github.com/your-username/InstantEats.git`
-2. Navigate to the project directory: `cd InstantEats`
+1. Clone the repository: `git clone https://github.com/your-repo.git`
+2. Navigate to the project directory: `cd Shoppi`
 3. Install dependencies: `npm install`
 4. Start the development server: `npm start`
 

@@ -38,9 +38,9 @@ function App() {
     }
   };
 
-  // local storage
+  // session storage
   useEffect(() => {
-    const json = localStorage.getItem("cartItem");
+    const json = sessionStorage.getItem("cartItem");
     const savedCart = JSON.parse(json);
     if (savedCart) {
       setCartItem(savedCart);
@@ -49,7 +49,7 @@ function App() {
 
   useEffect(() => {
     const json = JSON.stringify(cartItem);
-    localStorage.setItem("cartItem", json);
+    sessionStorage.setItem("cartItem", json);
   }, [cartItem]);
 
   useEffect(() => {
