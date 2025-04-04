@@ -414,3 +414,33 @@
     top: 3rem;
     cursor: pointer;
 }
+
+.nav-user {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-email {
+    font-size: 1.6rem;
+    font-weight: 500;
+}
+
+.logout-btn {
+    background: none;
+    border: 1px solid #000;
+    padding: 0.5rem 1rem;
+    font-size: 1.4rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.logout-btn:hover {
+    background: #000;
+    color: white;
+}
+
+.login-link {
+    display: flex;
+    align-items: center;
+}

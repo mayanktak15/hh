@@ -121,13 +121,13 @@ function Navbar() {
               </Link>
               {/* User Authentication */}
               {user ? (
-                <>
-                  <span>{user.email}</span>
-                  <button onClick={handleSignOut}>Sign Out</button>
-                </>
+                <div className="nav-user">
+                  <span className="user-email">{user.email?.split('@')[0]}</span>
+                  <button className="logout-btn" onClick={handleSignOut}>Sign Out</button>
+                </div>
               ) : (
-                <Link to="/user">
-                  <IconUser/>
+                <Link to="/user" className="login-link">
+                  <IconUser size={24} />
                 </Link>
               )}
               <i

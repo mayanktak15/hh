@@ -12,14 +12,17 @@ import Jeans from "./components/Categories-pages/Jeans";
 import ProductPage, { CartContext } from "./pages/ProductPage";
 import { useEffect, useState } from "react";
 import User from "./components/Authentication/User";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./utils/firebase";
 import { addUser, removeUser } from "./utils/userSlice";
 import ProtectedRoute from "./utils/ProtectedRoute";
+import { getDatabase, ref, set, get } from "firebase/database";
+import { setCart } from "./utils/cartSlice";
 
 function App() {
   const dispatch = useDispatch();
+  const user = useSelector((store) => store.user);
 
   const [cartItem, setCartItem] = useState([]);
 
@@ -62,6 +65,38 @@ function App() {
       }
     });
   }, []);
+
+  // Save cart to Firebase when it changes
+  useEffect(() => {
+    if (user && cartItem.length > 0) {
+      const db = getDatabase();
+      set(ref(db, `carts/${user.uid}`), {
+        items: cartItem,
+      }).catch((error) => {
+        console.error("Error saving cart:", error);
+      });
+    }
+  }, [cartItem, user]);
+
+  // Load cart from Firebase on login
+  useEffect(() => {
+    if (user) {
+      const db = getDatabase();
+      get(ref(db, `carts/${user.uid}`)).then((snapshot) => {
+        if (snapshot.exists()) {
+          const savedCart = snapshot.val().items;
+          setCartItem(savedCart);
+          dispatch(setCart(savedCart));
+        }
+      }).catch((error) => {
+        console.error("Error loading cart:", error);
+      });
+    } else {
+      // Clear cart when user logs out
+      setCartItem([]);
+      dispatch(setCart([]));
+    }
+  }, [user, dispatch]);
 
   return (
     <CartContext.Provider value={{ cartItem, addToCart, setCartItem }}>
