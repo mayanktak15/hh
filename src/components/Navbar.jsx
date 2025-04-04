@@ -1,7 +1,7 @@
 import "./Navbar.css";
 
 import LogoImg2 from "../img/new-logo-nav.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useContext, useState } from "react";
 import CartWithItems from "./CartWithItems";
 import EmptyCart from "./EmptyCart";
@@ -12,6 +12,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../utils/firebase";
 
 function Navbar() {
+  const navigate = useNavigate();
   const [sticky, setSticky] = useState(false);
   const [mobileNav, setMobileNav] = useState(false);
   const [cart, setCart] = useState(false);
