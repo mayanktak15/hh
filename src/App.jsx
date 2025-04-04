@@ -11,15 +11,16 @@ import Tshirt from "./components/Categories-pages/Tshirt";
 import Jeans from "./components/Categories-pages/Jeans";
 import ProductPage, { CartContext } from "./pages/ProductPage";
 import { useEffect, useState } from "react";
-import User from "./components/Authentication/User"
-import {  useDispatch } from "react-redux";
-import {  onAuthStateChanged } from "firebase/auth";
-import {auth} from "./utils/firebase"
+import User from "./components/Authentication/User";
+import { useDispatch } from "react-redux";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "./utils/firebase";
 import { addUser, removeUser } from "./utils/userSlice";
+import ProtectedRoute from "./utils/ProtectedRoute";
 
 function App() {
   const dispatch = useDispatch();
- 
+
   const [cartItem, setCartItem] = useState([]);
 
   const addToCart = (item) => {
@@ -40,26 +41,30 @@ function App() {
     localStorage.setItem("cartItem", json);
   }, [cartItem]);
 
-  useEffect(()=>{
+  useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        const {uid,email,displayName} = user;
-        dispatch(addUser({uid:uid, email:email, displayName:displayName}));
-       
+        const { uid, email, displayName } = user;
+        dispatch(addUser({ uid: uid, email: email, displayName: displayName }));
       } else {
-       dispatch(removeUser());
+        dispatch(removeUser());
       }
     });
-    
-  },[])
+  }, []);
 
   return (
-  
     <CartContext.Provider value={{ cartItem, addToCart, setCartItem }}>
       <Navbar />
       <Routes>
         <Route index path="/" element={<Home />} />
-        <Route path="categories" element={<Categories />}>
+        <Route
+          path="categories"
+          element={
+            <ProtectedRoute>
+              <Categories />
+            </ProtectedRoute>
+          }
+        >
           <Route path="all" element={<All />} />
           <Route path="shoes" element={<Shoes />} />
           <Route path="backpacks" element={<Backpacks />} />
@@ -68,11 +73,17 @@ function App() {
           <Route path="tshirt" element={<Tshirt />} />
           <Route path="jeans" element={<Jeans />} />
         </Route>
-        <Route path="categories/product/:id" element={<ProductPage />} />
-        <Route path="/user" element={<User/>}/>
+        <Route
+          path="categories/product/:id"
+          element={
+            <ProtectedRoute>
+              <ProductPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/user" element={<User />} />
       </Routes>
     </CartContext.Provider>
-    
   );
 }
 
