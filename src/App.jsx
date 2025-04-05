@@ -28,84 +28,82 @@ function App() {
 
   const addToCart = (item) => {
     const existingItem = cartItem.find((cartItem) => cartItem.id === item.id);
-    if (existingItem) {
-      setCartItem(
-        cartItem.map((cartItem) =>
+    const newCart = existingItem 
+      ? cartItem.map((cartItem) =>
           cartItem.id === item.id
             ? { ...cartItem, quantity: cartItem.quantity + item.quantity }
             : cartItem
         )
-      );
-    } else {
-      setCartItem([...cartItem, item]);
+      : [...cartItem, item];
+    
+    setCartItem(newCart);
+    
+    // Save to Firebase if user is logged in
+    if (user) {
+      const db = getDatabase();
+      set(ref(db, `carts/${user.uid}`), {
+        items: newCart
+      });
     }
   };
 
-  // session storage
+  // Load cart from session storage only if user is not logged in
   useEffect(() => {
-    const json = sessionStorage.getItem("cartItem");
-    const savedCart = JSON.parse(json);
-    if (savedCart) {
-      setCartItem(savedCart);
+    if (!user) {
+      const json = sessionStorage.getItem("cartItem");
+      const savedCart = JSON.parse(json);
+      if (savedCart) {
+        setCartItem(savedCart);
+      }
     }
-  }, []);
+  }, [user]);
 
+  // Save to session storage only if user is not logged in
   useEffect(() => {
-    const json = JSON.stringify(cartItem);
-    sessionStorage.setItem("cartItem", json);
-  }, [cartItem]);
+    if (!user) {
+      const json = JSON.stringify(cartItem);
+      sessionStorage.setItem("cartItem", json);
+    }
+  }, [cartItem, user]);
 
-  // Modified useEffect to handle cart persistence
+  // Auth state changes
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         const { uid, email, displayName } = user;
         dispatch(addUser({ uid: uid, email: email, displayName: displayName }));
 
-        // Load cart data when user logs in
+        // Load cart from Firebase when user logs in
         const db = getDatabase();
-        get(ref(db, `carts/${uid}`)).then((snapshot) => {
-          if (snapshot.exists()) {
-            const savedCart = snapshot.val().items;
-            setCartItem(savedCart);
-            dispatch(setCart(savedCart));
-          }
-        }).catch((error) => {
-          console.error("Error loading cart:", error);
-        });
+        get(ref(db, `carts/${uid}`))
+          .then((snapshot) => {
+            if (snapshot.exists()) {
+              const savedCart = snapshot.val().items;
+              setCartItem(savedCart);
+              dispatch(setCart(savedCart));
+            } else {
+              // If no cart exists in Firebase, use session storage cart
+              const sessionCart = JSON.parse(sessionStorage.getItem("cartItem")) || [];
+              setCartItem(sessionCart);
+              // Save session cart to Firebase
+              set(ref(db, `carts/${uid}`), {
+                items: sessionCart
+              });
+            }
+          })
+          .catch((error) => {
+            console.error("Error loading cart:", error);
+          });
       } else {
         dispatch(removeUser());
+        // When logging out, load cart from session storage
+        const sessionCart = JSON.parse(sessionStorage.getItem("cartItem")) || [];
+        setCartItem(sessionCart);
       }
     });
+
+    return () => unsubscribe();
   }, []);
-
-  // Save cart to Firebase when it changes and user is logged in
-  useEffect(() => {
-    if (user && cartItem.length > 0) {
-      const db = getDatabase();
-      set(ref(db, `carts/${user.uid}`), {
-        items: cartItem,
-      }).catch((error) => {
-        console.error("Error saving cart:", error);
-      });
-    }
-  }, [cartItem, user]);
-
-  // Load cart from Firebase on component mount or user change
-  useEffect(() => {
-    if (user) {
-      const db = getDatabase();
-      get(ref(db, `carts/${user.uid}`)).then((snapshot) => {
-        if (snapshot.exists()) {
-          const savedCart = snapshot.val().items;
-          setCartItem(savedCart);
-          dispatch(setCart(savedCart));
-        }
-      }).catch((error) => {
-        console.error("Error loading cart:", error);
-      });
-    }
-  }, [user]);
 
   return (
     <CartContext.Provider value={{ cartItem, addToCart, setCartItem }}>
