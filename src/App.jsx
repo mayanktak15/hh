@@ -79,7 +79,7 @@ function App() {
     });
   }, []);
 
-  // Save cart to Firebase when it changes
+  // Save cart to Firebase when it changes and user is logged in
   useEffect(() => {
     if (user && cartItem.length > 0) {
       const db = getDatabase();
@@ -91,7 +91,7 @@ function App() {
     }
   }, [cartItem, user]);
 
-  // Load cart from Firebase on login
+  // Load cart from Firebase on component mount or user change
   useEffect(() => {
     if (user) {
       const db = getDatabase();
@@ -104,12 +104,8 @@ function App() {
       }).catch((error) => {
         console.error("Error loading cart:", error);
       });
-    } else {
-      // Clear cart when user logs out
-      setCartItem([]);
-      dispatch(setCart([]));
     }
-  }, [user, dispatch]);
+  }, [user]);
 
   return (
     <CartContext.Provider value={{ cartItem, addToCart, setCartItem }}>
