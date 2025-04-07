@@ -47,10 +47,10 @@ function App() {
     }
   };
 
-  // Load cart from session storage only if user is not logged in
+  // Load cart from local storage only if user is not logged in
   useEffect(() => {
     if (!user) {
-      const json = sessionStorage.getItem("cartItem");
+      const json = localStorage.getItem("cartItem");
       const savedCart = JSON.parse(json);
       if (savedCart) {
         setCartItem(savedCart);
@@ -58,11 +58,11 @@ function App() {
     }
   }, [user]);
 
-  // Save to session storage only if user is not logged in
+  // Save to local storage only if user is not logged in
   useEffect(() => {
     if (!user) {
       const json = JSON.stringify(cartItem);
-      sessionStorage.setItem("cartItem", json);
+      localStorage.setItem("cartItem", json);
     }
   }, [cartItem, user]);
 
@@ -82,12 +82,12 @@ function App() {
               setCartItem(savedCart);
               dispatch(setCart(savedCart));
             } else {
-              // If no cart exists in Firebase, use session storage cart
-              const sessionCart = JSON.parse(sessionStorage.getItem("cartItem")) || [];
-              setCartItem(sessionCart);
-              // Save session cart to Firebase
+              // If no cart exists in Firebase, use local storage cart
+              const localCart = JSON.parse(localStorage.getItem("cartItem")) || [];
+              setCartItem(localCart);
+              // Save local cart to Firebase
               set(ref(db, `carts/${uid}`), {
-                items: sessionCart
+                items: localCart
               });
             }
           })
@@ -96,9 +96,9 @@ function App() {
           });
       } else {
         dispatch(removeUser());
-        // When logging out, load cart from session storage
-        const sessionCart = JSON.parse(sessionStorage.getItem("cartItem")) || [];
-        setCartItem(sessionCart);
+        // When logging out, load cart from local storage
+        const localCart = JSON.parse(localStorage.getItem("cartItem")) || [];
+        setCartItem(localCart);
       }
     });
 

@@ -9,7 +9,7 @@ function CategoriesItem() {
   const handleProductClick = (e, productId) => {
     e.preventDefault();
     if (!user) {
-      sessionStorage.setItem('intendedUrl', `/categories/product/${productId}`);
+      localStorage.setItem('intendedUrl', `/categories/product/${productId}`);
       navigate("/user");
       return;
     }
