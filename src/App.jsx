@@ -26,7 +26,7 @@ function App() {
 
   const [cartItem, setCartItem] = useState([]);
 
-  const addToCart = (item) => {
+  const addToCart = async (item) => {
     const existingItem = cartItem.find((cartItem) => cartItem.id === item.id);
     const newCart = existingItem 
       ? cartItem.map((cartItem) =>
@@ -38,12 +38,19 @@ function App() {
     
     setCartItem(newCart);
     
-    // Save to Firebase if user is logged in
+    // Always save to local storage
+    localStorage.setItem("cartItem", JSON.stringify(newCart));
+    
+    // If user is logged in, also save to Firebase
     if (user) {
-      const db = getDatabase();
-      set(ref(db, `carts/${user.uid}`), {
-        items: newCart
-      });
+      try {
+        const db = getDatabase();
+        await set(ref(db, `carts/${user.uid}`), {
+          items: newCart
+        });
+      } catch (error) {
+        console.error("Error saving cart to Firebase:", error);
+      }
     }
   };
 
@@ -68,37 +75,40 @@ function App() {
 
   // Auth state changes
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const { uid, email, displayName } = user;
         dispatch(addUser({ uid: uid, email: email, displayName: displayName }));
 
         // Load cart from Firebase when user logs in
         const db = getDatabase();
-        get(ref(db, `carts/${uid}`))
-          .then((snapshot) => {
-            if (snapshot.exists()) {
-              const savedCart = snapshot.val().items;
-              setCartItem(savedCart);
-              dispatch(setCart(savedCart));
-            } else {
-              // If no cart exists in Firebase, use local storage cart
-              const localCart = JSON.parse(localStorage.getItem("cartItem")) || [];
-              setCartItem(localCart);
-              // Save local cart to Firebase
-              set(ref(db, `carts/${uid}`), {
-                items: localCart
-              });
-            }
-          })
-          .catch((error) => {
-            console.error("Error loading cart:", error);
-          });
+        try {
+          const snapshot = await get(ref(db, `carts/${uid}`));
+          if (snapshot.exists()) {
+            const savedCart = snapshot.val().items;
+            setCartItem(savedCart);
+            dispatch(setCart(savedCart));
+          } else {
+            const localCart = JSON.parse(localStorage.getItem("cartItem")) || [];
+            setCartItem(localCart);
+            // Save local cart to Firebase
+            await set(ref(db, `carts/${uid}`), {
+              items: localCart
+            });
+          }
+        } catch (error) {
+          console.error("Error loading cart:", error);
+        }
       } else {
+        // Before signing out, save current cart to local storage
+        const currentCart = [...cartItem];
+        localStorage.setItem("cartItem", JSON.stringify(currentCart));
+        
         dispatch(removeUser());
-        // When logging out, load cart from local storage
+        // Load the saved cart from local storage after sign out
         const localCart = JSON.parse(localStorage.getItem("cartItem")) || [];
         setCartItem(localCart);
+        dispatch(setCart(localCart));
       }
     });
 
@@ -106,31 +116,31 @@ function App() {
   }, []);
 
   return (
-    <CartContext.Provider value={{ cartItem, addToCart, setCartItem }}>
+    <CartContext.Provider value={{ cartItem, addToCart, setCartItem }}>/>} />
       <Navbar />
-      <Routes>
-        <Route index path="/" element={<Home />} />
-        <Route path="categories" element={<Categories />}>
-          <Route path="all" element={<All />} />
-          <Route path="shoes" element={<Shoes />} />
-          <Route path="backpacks" element={<Backpacks />} />
+      <Routes> path="accessories" element={<Accessories />} />
+          <Route path="shoes" element={<Shoes />} />te path="tshirt" element={<Tshirt />} />
+          <Route path="backpacks" element={<Backpacks />} /><Jeans />} />
           <Route path="shirt" element={<Shirt />} />
           <Route path="accessories" element={<Accessories />} />
-          <Route path="tshirt" element={<Tshirt />} />
+          <Route path="tshirt" element={<Tshirt />} />oduct/:id"
           <Route path="jeans" element={<Jeans />} />
-        </Route>
-        <Route
+        </Route> <ProtectedRoute>
+        <Route    <ProductPage />
           path="categories/product/:id"
           element={
             <ProtectedRoute>
-              <ProductPage />
-            </ProtectedRoute>
-          }
+              <ProductPage />    <Route path="/user" element={<User />} />
+            </ProtectedRoute>     </Routes>
+          }    </CartContext.Provider>
         />
-        <Route path="/user" element={<User />} />
-      </Routes>
-    </CartContext.Provider>
-  );
-}
+        <Route path="/user" element={<User />} />}
 
+
+
+
+
+
+
+export default App;}  );    </CartContext.Provider>      </Routes>
 export default App;
